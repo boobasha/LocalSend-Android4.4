@@ -152,21 +152,32 @@ class AddDirectoryAction extends AsyncReduxAction<SelectedSendingFilesNotifier, 
     _logger.info('Reading files in $directoryPath');
     final newFiles = <CrossFile>[];
     final directoryName = p.basename(directoryPath);
-    await for (final entity in Directory(directoryPath).list(recursive: true)) {
+    // followLinks: false avoids symlink loops (e.g. legacy /sdcard self-references
+    // on some Android 4.4 devices) that would otherwise make recursion hang.
+    await for (final entity in Directory(directoryPath).list(recursive: true, followLinks: false)) {
       if (entity is File) {
         final relative = '$directoryName/${p.relative(entity.path, from: directoryPath).replaceAll('\\', '/')}';
+        final CrossFile file;
+        try {
+          file = CrossFile(
+            name: relative,
+            fileType: relative.guessFileType(),
+            size: entity.lengthSync(),
+            thumbnail: null,
+            asset: null,
+            path: entity.path,
+            bytes: null,
+            lastModified: entity.lastModifiedSync().toUtc(),
+            lastAccessed: entity.lastAccessedSync().toUtc(),
+          );
+        } catch (e) {
+          // A single unstat-able entry (broken symlink, file removed mid-scan,
+          // permission denied — all common on Android 4.4 external storage) must
+          // not abort the whole folder. Skip it and keep going.
+          _logger.warning('Skipping unreadable file ${entity.path}', e);
+          continue;
+        }
         _logger.info('Add file $relative');
-        final file = CrossFile(
-          name: relative,
-          fileType: relative.guessFileType(),
-          size: entity.lengthSync(),
-          thumbnail: null,
-          asset: null,
-          path: entity.path,
-          bytes: null,
-          lastModified: entity.lastModifiedSync().toUtc(),
-          lastAccessed: entity.lastAccessedSync().toUtc(),
-        );
 
         final isAlreadySelect = state.any((element) => element.isSameFile(otherFile: file));
         if (!isAlreadySelect) {

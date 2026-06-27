@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:localsend_app/gen/strings.g.dart';
 import 'package:localsend_app/pages/apk_picker_page.dart';
+import 'package:localsend_app/pages/file_browser_page.dart';
 import 'package:localsend_app/provider/device_info_provider.dart';
 import 'package:localsend_app/provider/selection/selected_sending_files_provider.dart';
 import 'package:localsend_app/theme.dart';
@@ -137,6 +138,19 @@ class PickFileAction extends AsyncGlobalAction {
 }
 
 Future<void> _pickFiles(BuildContext context, Ref ref) async {
+  // Android 4.4 (KitKat): use the in-app Material 3 file browser instead of the
+  // old system document picker (and keep plain file paths instead of content URIs).
+  if (checkPlatform([TargetPlatform.android]) && (ref.read(deviceRawInfoProvider).androidSdkInt ?? 0) < 21) {
+    try {
+      await Permission.storage.request();
+    } catch (_) {}
+    if (!context.mounted) {
+      return;
+    }
+    await context.push(() => const FileBrowserPage(selectFolder: false));
+    return;
+  }
+
   if (checkPlatform([TargetPlatform.android])) {
     // On android, the files are copied to the cache which takes some time.
     // ignore: unawaited_futures
@@ -184,6 +198,17 @@ Future<void> _pickFolder(BuildContext context, Ref ref) async {
       await Permission.storage.request();
     } catch (e) {
       _logger.warning('Failed to request storage permission', e);
+    }
+
+    // Android 4.4 (KitKat): the SAF directory-tree picker (ACTION_OPEN_DOCUMENT_TREE)
+    // is API 21+, so the system folder picker doesn't exist. Use the in-app file
+    // browser instead (it reads the filesystem directly via dart:io).
+    if ((ref.read(deviceRawInfoProvider).androidSdkInt ?? 0) < 21) {
+      if (!context.mounted) {
+        return;
+      }
+      await context.push(() => const FileBrowserPage(selectFolder: true));
+      return;
     }
   }
 
