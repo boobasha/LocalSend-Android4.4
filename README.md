@@ -95,13 +95,7 @@ Six small, isolate-independent fixes cherry-picked onto v1.15.1:
 
 ## Reference / test device
 
-Verified to launch and run on **Android 4.4.4 KitKat / armeabi-v7a** hardware (launches, renders, discovers, transfers):
-
-| | |
-|---|---|
-| Device | **Xiaomi Redmi Note** (Snapdragon 410 / 移动4G 强悍版 / 2 GB RAM) |
-| SoC | Qualcomm **Snapdragon 410 (MSM8916)**, armeabi-v7a (32-bit) |
-| OS | Android **4.4.4** KitKat (MIUI 6), 2015 |
+Verified to launch and run on a **Xiaomi Redmi Note 1** — **Android 4.4.4 KitKat**, **armeabi-v7a** (32-bit): the app launches, the UI renders, and discovery + transfer work.
 
 ## Build from source
 
@@ -114,8 +108,6 @@ flutter build apk --release --target-platform android-arm   --build-name=1.15.1.
 # arm64-v8a (Android 5.0+): set minSdkVersion 21 in app/android/app/build.gradle first
 flutter build apk --release --target-platform android-arm64 --build-name=1.15.1.6fix --build-number=50
 ```
-
-See [`ANDROID_4.4_PORT.md`](./ANDROID_4.4_PORT.md) for the full porting story and troubleshooting.
 
 ## Credits & License
 
@@ -197,13 +189,7 @@ v1.15.1 是**官方版本中能真正在 Android 4.4 上运行的最高版本**:
 
 ## 参考 / 测试设备
 
-已验证可在 **Android 4.4.4 KitKat / armeabi-v7a** 真机上启动并运行(启动不崩、UI 正常、能发现与传输):
-
-| | |
-|---|---|
-| 设备 | **小米红米 Note**(骁龙 410 / 移动4G 强悍版 / 2 GB 内存) |
-| SoC | 高通 **骁龙 410(MSM8916)**,armeabi-v7a(32 位) |
-| 系统 | Android **4.4.4** KitKat(MIUI 6),2015 年 |
+已在 **红米 Note 1**(**Android 4.4.4 KitKat**、**armeabi-v7a** 32 位)真机上验证:可正常启动、界面渲染、设备发现与传输。
 
 ## 从源码构建
 
@@ -216,8 +202,6 @@ flutter build apk --release --target-platform android-arm   --build-name=1.15.1.
 # arm64-v8a(安卓 5.0+):先把 app/android/app/build.gradle 里的 minSdkVersion 改成 21
 flutter build apk --release --target-platform android-arm64 --build-name=1.15.1.6fix --build-number=50
 ```
-
-完整移植细节与排错见 [`ANDROID_4.4_PORT.md`](./ANDROID_4.4_PORT.md)。
 
 ## 致谢与许可证
 
