@@ -14,7 +14,7 @@ Click a file to download directly · 点击文件名即可直接下载:
 
 | APK | minSdk | For / 适用设备 |
 |---|---|---|
-| [**LocalSend-1.15.1.6fix-android-arm64-v8a.apk**](https://github.com/boobasha/LocalSend-Android4.4/releases/download/v1.15.1.6fix/LocalSend-1.15.1.6fix-android-arm64-v8a.apk) | **21** | 64-bit phones, Android 5.0+ · 64 位手机(安卓 5.0+),不确定就选它 |
+| [**LocalSend-1.15.1.6fix-android-arm64-v8a.apk**](https://github.com/boobasha/LocalSend-Android4.4/releases/download/v1.15.1.6fix/LocalSend-1.15.1.6fix-android-arm64-v8a.apk) | **21** | 64-bit phones, Android 5.0+ · 64 位手机(安卓 5.0+) |
 | [**LocalSend-1.15.1.6fix-android4.4-armeabi-v7a.apk**](https://github.com/boobasha/LocalSend-Android4.4/releases/download/v1.15.1.6fix/LocalSend-1.15.1.6fix-android4.4-armeabi-v7a.apk) | **19** | 32-bit / old devices incl. Android 4.4 · 32 位 / 老设备,含安卓 4.4 KitKat |
 
 Both are version `1.15.1.6fix`. Package `org.localsend.localsend_app.android44` — installs **alongside** the official LocalSend. To sideload, enable *"Install unknown apps"* in Settings. See all files on the **[Releases](../../releases)** page.
