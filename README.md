@@ -81,8 +81,9 @@ So **v1.15.1 is the definitive working ceiling** (it already includes upstream f
 | Send individual files / media / text | ✅ |
 | Device discovery + transfer | ✅ |
 | **Send an entire folder** | ✅ (in-app picker) |
+| **Choose the receive/save folder** | ✅ (in-app picker) |
 
-**Folder sending on 4.4:** the system Storage Access Framework directory picker (`ACTION_OPEN_DOCUMENT_TREE`) is API 21+, so on KitKat the app falls back to a small built-in **Material 3 file/folder browser** that reads storage directly via `dart:io` (`READ_EXTERNAL_STORAGE` is install-granted and there's no scoped storage below API 21). Pick a folder and the whole tree is sent recursively; the same browser also backs the **file** picker (multi-select). Android 5.0+ keeps using the system SAF picker unchanged.
+**Folder picking on 4.4:** the system Storage Access Framework directory picker (`ACTION_OPEN_DOCUMENT_TREE`) is API 21+, so on KitKat the app falls back to a small built-in **Material 3 file/folder browser** that reads storage directly via `dart:io` (`READ_EXTERNAL_STORAGE` is install-granted and there's no scoped storage below API 21). It backs sending a whole folder (sent recursively), the multi-select **file** picker, **and** the receive-destination "save folder" setting. The browser has a large, tablet-friendly layout with an editable address bar (type a path to jump). Android 5.0+ keeps using the system SAF picker unchanged.
 
 ## Back-ported fixes (the "6fix")
 
@@ -185,8 +186,9 @@ v1.15.1 是**官方版本中能真正在 Android 4.4 上运行的最高版本**:
 | 发送单个文件 / 媒体 / 文本 | ✅ |
 | 设备发现 + 传输 | ✅ |
 | **发送整个文件夹** | ✅（应用内浏览器）|
+| **选择接收/保存目录** | ✅（应用内浏览器）|
 
-**4.4 上的文件夹发送:** 系统 SAF 目录树选择器(`ACTION_OPEN_DOCUMENT_TREE`)属于 API 21+,所以在 KitKat 上改用内置的 **Material 3 文件/文件夹浏览器**,通过 `dart:io` 直接读取存储(API 21 以下 `READ_EXTERNAL_STORAGE` 安装即授权、无分区存储)。选中文件夹后整棵目录树会被递归发送;同一个浏览器也用于**文件**选择(多选)。安卓 5.0+ 仍走系统 SAF 选择器,行为不变。
+**4.4 上的文件夹选择:** 系统 SAF 目录树选择器(`ACTION_OPEN_DOCUMENT_TREE`)属于 API 21+,所以在 KitKat 上改用内置的 **Material 3 文件/文件夹浏览器**,通过 `dart:io` 直接读取存储(API 21 以下 `READ_EXTERNAL_STORAGE` 安装即授权、无分区存储)。它同时支撑:发送整个文件夹(递归)、多选**文件**、以及**接收的「保存目录」设置**。浏览器采用适配平板的大尺寸布局,并带可编辑地址栏(输入路径直接跳转)。安卓 5.0+ 仍走系统 SAF 选择器,行为不变。
 
 ## 已回移植的修复("6fix")
 

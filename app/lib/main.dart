@@ -33,7 +33,8 @@ class LocalSendApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ref = context.ref;
-    final (themeMode, colorMode) = ref.watch(settingsProvider.select((settings) => (settings.theme, settings.colorMode)));
+    final (themeMode, colorMode) = ref.watch(settingsProvider
+        .select((settings) => (settings.theme, settings.colorMode)));
     final dynamicColors = ref.watch(dynamicColorsProvider);
     final customColor = ref.watch(customColorProvider);
     return TrayWatcher(
@@ -51,9 +52,29 @@ class LocalSendApp extends StatelessWidget {
               supportedLocales: AppLocaleUtils.supportedLocales,
               localizationsDelegates: GlobalMaterialLocalizations.delegates,
               debugShowCheckedModeBanner: false,
-              theme: getTheme(colorMode, Brightness.light, dynamicColors, customColor),
-              darkTheme: getTheme(colorMode, Brightness.dark, dynamicColors, customColor),
-              themeMode: colorMode == ColorMode.oled ? ThemeMode.dark : themeMode,
+              builder: (context, child) {
+                if (child == null) {
+                  return const SizedBox.shrink();
+                }
+                final mq = MediaQuery.of(context);
+                // Tablets only (large screens): scale text up so the UI isn't tiny.
+                // Phones are left exactly as-is.
+                if (mq.size.shortestSide < 600) {
+                  return child;
+                }
+                return MediaQuery(
+                  data: mq.copyWith(
+                      textScaleFactor:
+                          (mq.textScaleFactor * 1.3).clamp(1.0, 2.0)),
+                  child: child,
+                );
+              },
+              theme: getTheme(
+                  colorMode, Brightness.light, dynamicColors, customColor),
+              darkTheme: getTheme(
+                  colorMode, Brightness.dark, dynamicColors, customColor),
+              themeMode:
+                  colorMode == ColorMode.oled ? ThemeMode.dark : themeMode,
               navigatorKey: Routerino.navigatorKey,
               home: RouterinoHome(
                 builder: () => const HomePage(
