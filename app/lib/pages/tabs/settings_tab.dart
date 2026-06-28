@@ -19,6 +19,7 @@ import 'package:localsend_app/theme.dart';
 import 'package:localsend_app/util/device_type_ext.dart';
 import 'package:localsend_app/util/native/pick_directory_path.dart';
 import 'package:localsend_app/util/native/platform_check.dart';
+import 'package:localsend_app/util/ui/dynamic_colors.dart';
 import 'package:localsend_app/widget/custom_dropdown_button.dart';
 import 'package:localsend_app/widget/dialogs/encryption_disabled_notice.dart';
 import 'package:localsend_app/widget/dialogs/pin_dialog.dart';
@@ -763,32 +764,52 @@ class _ColorSeedPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final ref = context.ref;
     final current = ref.watch(customColorProvider);
+    final colorMode = ref.watch(settingsProvider.select((s) => s.colorMode));
+    final supportsSystemColor = ref.read(dynamicColorsProvider) != null;
+    final isSystem = colorMode == ColorMode.system;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Wrap(
         spacing: 12,
         runSpacing: 12,
-        children: _presets.map((color) {
-          final isDefault = color.value == Colors.teal.value;
-          final selected = current == null ? isDefault : current == color.value;
-          return _ColorDot(
-            color: color,
-            selected: selected,
-            onTap: () async {
-              await ref
-                  .notifier(customColorProvider)
-                  .setColor(isDefault ? null : color.value);
-              // On Android 12+ the default color mode is "system" (dynamic color),
-              // which ignores the custom color. Switch to LocalSend mode so the
-              // picked color actually takes effect on every Android version.
-              if (ref.read(settingsProvider).colorMode == ColorMode.system) {
+        children: [
+          // System dynamic color: a dedicated button, shown only where the
+          // system actually exposes an accent color (Android 12+).
+          if (supportsSystemColor)
+            _ColorDot(
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              selected: isSystem,
+              isSystem: true,
+              tooltip: t.settingsTab.general.colorOptions.system,
+              onTap: () async {
                 await ref
                     .notifier(settingsProvider)
-                    .setColorMode(ColorMode.localsend);
-              }
-            },
-          );
-        }).toList(),
+                    .setColorMode(ColorMode.system);
+              },
+            ),
+          ..._presets.map((color) {
+            final isDefault = color.value == Colors.teal.value;
+            final selected = !isSystem &&
+                (current == null ? isDefault : current == color.value);
+            return _ColorDot(
+              color: color,
+              selected: selected,
+              onTap: () async {
+                await ref
+                    .notifier(customColorProvider)
+                    .setColor(isDefault ? null : color.value);
+                // On Android 12+ the default color mode is "system" (dynamic),
+                // which ignores the custom color. Switch to LocalSend mode so the
+                // picked color actually takes effect on every Android version.
+                if (ref.read(settingsProvider).colorMode == ColorMode.system) {
+                  await ref
+                      .notifier(settingsProvider)
+                      .setColorMode(ColorMode.localsend);
+                }
+              },
+            );
+          }),
+        ],
       ),
     );
   }
@@ -798,33 +819,41 @@ class _ColorDot extends StatelessWidget {
   final Color color;
   final bool selected;
   final VoidCallback onTap;
+  final bool isSystem;
+  final String? tooltip;
 
   const _ColorDot({
     required this.color,
     required this.selected,
     required this.onTap,
+    this.isSystem = false,
+    this.tooltip,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    final scheme = Theme.of(context).colorScheme;
+    final dot = InkWell(
       onTap: onTap,
       customBorder: const CircleBorder(),
       child: Container(
-        width: 38,
-        height: 38,
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
           border: selected
-              ? Border.all(
-                  color: Theme.of(context).colorScheme.onSurface, width: 3)
-              : null,
+              ? Border.all(color: scheme.onSurface, width: 3)
+              : (isSystem ? Border.all(color: scheme.outline, width: 1) : null),
         ),
-        child: selected
-            ? const Icon(Icons.check, color: Colors.white, size: 20)
-            : null,
+        child: isSystem
+            ? Icon(Icons.brightness_auto,
+                size: 24, color: scheme.onSurfaceVariant)
+            : (selected
+                ? const Icon(Icons.check, color: Colors.white, size: 22)
+                : null),
       ),
     );
+    return tooltip == null ? dot : Tooltip(message: tooltip!, child: dot);
   }
 }
